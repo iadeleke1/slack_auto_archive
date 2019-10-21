@@ -9,6 +9,8 @@ import os
 import sys
 import time
 import json
+import csv
+import logging
 
 # not standard imports
 import requests
@@ -48,7 +50,6 @@ class ChannelReaper():
 This channel has had no activity for %d days. It is being auto-archived.
 If you feel this is a mistake you can <https://get.slack.help/hc/en-us/articles/201563847-Archive-a-channel#unarchive-a-channel|unarchive this channel>.
 This will bring it back at any point. In the future, you can add '%%noarchive' to your channel topic or purpose to avoid being archived.
-This script was run from this repo: https://github.com/Symantec/slack-autoarchive
 """ % self.settings.get('days_inactive')
         alerts = {'channel_template': archive_msg}
         if os.path.isfile('templates.json'):
@@ -186,8 +187,8 @@ This script was run from this repo: https://github.com/Symantec/slack-autoarchiv
         """ Send a message to a channel or user. """
         payload = {
             'channel': channel_id,
-            'username': 'channel_reaper',
-            'icon_emoji': ':ghost:',
+            'username': 'Collaboration Slack AutoArchiver',
+            'icon_emoji': ':taxi:',
             'text': message
         }
         api_endpoint = 'chat.postMessage'
@@ -244,7 +245,16 @@ This script was run from this repo: https://github.com/Symantec/slack-autoarchiv
                 archived_channels.append(channel)
                 self.archive_channel(channel,
                                      alert_templates['channel_template'])
+                try:
+                    warn_channels = open("audit.csv", "a")
 
+                    fieldnames = ['Channel','Archive_Date']
+                    writer = csv.DictWriter(warn_channels, fieldnames= fieldnames)
+                    writer.writeheader()
+                    writer.writerow({'Channel': channel, 'Archive_Date': datetime.today().strftime('%Y-%m-%d')})
+                    warn_channels.close()
+                except Exception as e:
+                    logging.exception(e) 
         self.send_admin_report(archived_channels)
 
 

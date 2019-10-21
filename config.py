@@ -8,15 +8,15 @@ from datetime import datetime, timedelta
 
 def get_channel_reaper_settings():
     """ This returns a dictionary of all settings. """
-    days_inactive = int(os.environ.get('DAYS_INACTIVE', 60))
+    days_inactive = int(os.environ.get('DAYS_INACTIVE', 365))
     return {
-        'admin_channel': os.environ.get('ADMIN_CHANNEL', ''),
+        'admin_channel': os.environ.get('ADMIN_CHANNEL', 'automation-collab'),
         'days_inactive': days_inactive,
         # set MIN_MEMBERS and any channels larger than this in people
         # are exempt from archiving. 0 is no limit.
         'min_members': int(os.environ.get('MIN_MEMBERS', 0)),
-        'dry_run': (os.environ.get('DRY_RUN', 'true') == 'true'),
-        'slack_token': os.environ.get('SLACK_TOKEN', ''),
+        'dry_run': (os.environ.get('DRY_RUN', 'true') == 'false'),
+        'slack_token': os.environ.get('SLACK_TOKEN', 'xoxp-2151819982-691000187587-745945271842-9d50384f2a0e6ea58322130344a7c86c'),
         'too_old_datetime': (datetime.now() - timedelta(days=days_inactive)),
         'whitelist_keywords': os.environ.get('WHITELIST_KEYWORDS', ''),
         'skip_subtypes': {'channel_leave', 'channel_join'},
